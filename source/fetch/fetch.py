@@ -189,10 +189,10 @@ class Dataset:
         return
 
 
-def main():
-    dataset = Dataset()
-    dataset.create_dataset()
+#def main():
+#    dataset = Dataset()
+#    dataset.create_dataset()
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()

@@ -60,12 +60,12 @@ class Candlesticks:
         return
 
 
-def main():
-    dataset = Dataset()
-    dataframe_btc = dataset.get_btc_data()
-    candlesticks = Candlesticks()
-    candlesticks.display_candlesticks_chart(dataframe_btc)
+#def main():
+#    dataset = Dataset()
+#    dataframe_btc = dataset.get_btc_data()
+#    candlesticks = Candlesticks()
+#    candlesticks.display_candlesticks_chart(dataframe_btc)
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()

@@ -68,12 +68,12 @@ class Arff:
         return
 
 
-def main():
-    convert = Arff()
-    convert.generate_arff()
-    convert.generate_arff_with_future()
-    return
+#def main():
+#    convert = Arff()
+#    convert.generate_arff()
+#    convert.generate_arff_with_future()
+#    return
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()

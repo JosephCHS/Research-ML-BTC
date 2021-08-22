@@ -466,26 +466,26 @@ class MachineLearning:
         return pred_y
 
 
-def main():
-    # Instantiate class
-    machine_learning = MachineLearning()
-    machine_learning.display_information()
-    # Model sklearn
-    models_sklearn = [
-        machine_learning.model_logistic_regression(),
-        machine_learning.model_svm(),
-    ]
-    # Display models results sklearn
-    for model in models_sklearn:
-        machine_learning.display_result(model)
-    machine_learning.display_report_sklearn()
-    # Model Keras
-    machine_learning.model_lstm()
-    machine_learning.model_cnn()
-    # Model Pytorch
-    machine_learning.model_bnn()
-    return
+#def main():
+#    # Instantiate class
+#    machine_learning = MachineLearning()
+#    machine_learning.display_information()
+#    # Model sklearn
+#    models_sklearn = [
+#        machine_learning.model_logistic_regression(),
+#        machine_learning.model_svm(),
+#    ]
+#    # Display models results sklearn
+#    for model in models_sklearn:
+#        machine_learning.display_result(model)
+#    machine_learning.display_report_sklearn()
+#    # Model Keras
+#    machine_learning.model_lstm()
+#    machine_learning.model_cnn()
+#    # Model Pytorch
+#    machine_learning.model_bnn()
+#    return
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
