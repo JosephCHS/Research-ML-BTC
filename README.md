@@ -17,7 +17,7 @@ It is avaible on :
 The documentation is generated with the Sphinx framework with the Read The Doc template.
 It is accessible via the file: `/documentation/build/html/index.html`
 
-# Pré-requis (linux)
+# Pre-requisites (linux)
 
 1. Git clones the repository: 
 - `git clone git@gitlab-student.macs.hw.ac.uk:jmmc2000/f21mp_2020-2021.git`
