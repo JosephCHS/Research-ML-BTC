@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>source.fetch.fetch &mdash; Research-ML-BTC [0.1] documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Research-ML-BTC
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Research-ML-BTC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>source.fetch.fetch</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for source.fetch.fetch</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">investpy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">quandl</span>
+
+
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is a class used to create the dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__btc_csv_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="s2">&quot;data/BNC_BLX.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__future_btc_csv_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="s2">&quot;data/CME_DL_BTC1!.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__blockchain_btc_csv_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="s2">&quot;data/blockchain.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_csv_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="s2">&quot;data/dataset.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_csv_with_future_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="s2">&quot;data/dataset_with_future.csv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__btc_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_btc_data</span><span class="p">()</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="Dataset.fetch_btc_data"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.fetch_btc_data">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_btc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store historical data about Bitcoin (BNC_BLX) in a pandas dataframe, from 03/06/2012 to</span>
+<span class="sd">        15/07/2021. (time,open,high,low,close,EMA,MA,Volume,Volume MA,Basis,Upper,Lower,RSI)</span>
+
+<span class="sd">        :return: BTC data (time,open,high,low,close,EMA,MA,Volume,Volume MA,Basis,Upper,Lower,RSI) 03/06/2012-15/07/2021</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">btc_abs_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__btc_csv_path</span><span class="p">)</span>
+        <span class="n">btc_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">btc_abs_path</span><span class="p">)</span>
+        <span class="n">btc_data</span> <span class="o">=</span> <span class="n">btc_data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;Position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">btc_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;Position&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">btc_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;Position&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">btc_data</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+        <span class="n">btc_data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">btc_data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+        <span class="n">btc_data</span> <span class="o">=</span> <span class="n">btc_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">btc_data</span></div>
+
+<div class="viewcode-block" id="Dataset.fetch_future_btc_data"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.fetch_future_btc_data">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_future_btc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store future (CME) from 17/12/2017 to 15/07/2021.</span>
+
+<span class="sd">        :return: Future CME BTC data (close) 17/12/2017-15/07/2021</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">abs_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_absolut_path_to_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__future_btc_csv_path</span><span class="p">)</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_path</span><span class="p">)</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">future_btc_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;MA&quot;</span><span class="p">,</span> <span class="s2">&quot;Volume&quot;</span><span class="p">,</span> <span class="s2">&quot;Volume MA&quot;</span><span class="p">,</span> <span class="s2">&quot;Basis&quot;</span><span class="p">,</span> <span class="s2">&quot;Upper&quot;</span><span class="p">,</span> <span class="s2">&quot;Lower&quot;</span><span class="p">,</span> <span class="s2">&quot;RSI&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">future_btc_data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">future_btc_data</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">future_btc_data</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">future_btc_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;close&quot;</span><span class="p">:</span> <span class="s2">&quot;Close-future&quot;</span><span class="p">},</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">future_btc_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2017-12-17&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-07-15&#39;</span><span class="p">)</span>
+        <span class="n">future_btc_data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">future_btc_data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">future_btc_data</span> <span class="o">=</span> <span class="n">future_btc_data</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">future_btc_data</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">future_btc_data</span></div>
+
+<div class="viewcode-block" id="Dataset.fetch_blockchain_btc_data"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.fetch_blockchain_btc_data">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_blockchain_btc_data</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Store historical data about Blockchain data from Quandl&#39;s API which use Blockchain.com as source.</span>
+<span class="sd">        DIFF: Bitcoin Difficulty, A relative measure of how difficult it is to find a new block. The difficulty is</span>
+<span class="sd">        adjusted periodically as a function of how much hashing power has been deployed by the network of miners.</span>
+<span class="sd">        MWNTD: Bitcoin My Wallet Number of Transaction Per Day</span>
+<span class="sd">        MWTRV: Bitcoin My Wallet Transaction Volume, 24hr Transaction Volume of our web wallet service.</span>
+<span class="sd">        MIREV: Bitcoin Miners Revenue, total value of coinbase block rewards and transaction fees paid to miners.</span>
+<span class="sd">        HRATE: Bitcoin Hash Rate, the estimated number of tera hashes per second (trillions of hashes per second) the</span>
+<span class="sd">        Bitcoin network is performing.</span>
+<span class="sd">        BLCHS: Bitcoin api.blockchain Size, the total size of all block headers and transactions.</span>
+<span class="sd">        Not including database indexes.</span>
+<span class="sd">        AVBLS: Bitcoin Average Block Size, the average block size in MB.</span>
+<span class="sd">        BCDDY: Bitcoin Days Destroyed (Minimum Age 1 Year). A non-cumulative version of Bitcoin Days Destroyed.</span>
+<span class="sd">        Bitcoin Days Destroyed is a measure of the transaction volume of Bitcoin. If someone has 100 BTC that they</span>
+<span class="sd">        received a week ago and they spend it then 700 bitcoin days have been destroyed. If they take those 100BTC and</span>
+<span class="sd">        send them to several addresses and then spend them then although the total transaction volume could be</span>
+<span class="sd">        arbitrarily large the number of bitcoin days destroyed is still 700.</span>
+<span class="sd">        ATRCT: Bitcoin Median Transaction Confirmation Time, the median time for a transaction to be accepted into a mined</span>
+<span class="sd">        block and added to the public ledger (note: only includes transactions with miner fees).</span>
+<span class="sd">        TOTBC: Total Bitcoins, the total number of bitcoins that have already been mined; in other words, the current</span>
+<span class="sd">        supply of bitcoins on the network.</span>
+<span class="sd">        MKTCP: Bitcoin Market Capitalization, the total USD value of bitcoin supply in circulation, as calculated by the</span>
+<span class="sd">        daily average market price across major exchanges.</span>
+
+<span class="sd">        :return: blockchain information from 03/06/2012 to 15/07/2021.</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_quandl</span> <span class="o">=</span> <span class="s2">&quot;BCHAIN/</span><span class="si">{}</span><span class="s2">&quot;</span>
+        <span class="n">api_quandl</span> <span class="o">=</span> <span class="s2">&quot;vHzZzEA5BpYFshNB7YXs&quot;</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DIFF&quot;</span><span class="p">,</span> <span class="s2">&quot;MWNTD&quot;</span><span class="p">,</span> <span class="s2">&quot;MWTRV&quot;</span><span class="p">,</span> <span class="s2">&quot;MIREV&quot;</span><span class="p">,</span> <span class="s2">&quot;HRATE&quot;</span><span class="p">,</span> <span class="s2">&quot;BLCHS&quot;</span><span class="p">,</span> <span class="s2">&quot;AVBLS&quot;</span><span class="p">,</span> <span class="s2">&quot;BCDDY&quot;</span><span class="p">,</span> <span class="s2">&quot;ATRCT&quot;</span><span class="p">,</span> <span class="s2">&quot;TOTBC&quot;</span><span class="p">,</span> <span class="s2">&quot;MKTCP&quot;</span><span class="p">)</span>
+        <span class="n">dataframes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">quandl</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint_quandl</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint</span><span class="p">),</span>
+                              <span class="n">start_date</span><span class="o">=</span><span class="s2">&quot;2012-06-03&quot;</span><span class="p">,</span>
+                              <span class="n">end_date</span><span class="o">=</span><span class="s2">&quot;2021-07-15&quot;</span><span class="p">,</span>
+                              <span class="n">authtoken</span><span class="o">=</span><span class="n">api_quandl</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Value-</span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="n">dataframes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.fix_blockchains_dataframe"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.fix_blockchains_dataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fix_blockchains_dataframe</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2012-06-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-07-15&#39;</span><span class="p">)</span>
+        <span class="n">dataframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">column_name</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dataframe</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bfill</span><span class="p">())</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataframe</span></div>
+
+<div class="viewcode-block" id="Dataset.fetch_data_by_symbol"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.fetch_data_by_symbol">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_data_by_symbol</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Store historical data about Crude Oil WTI Futures (exchange ICE) and AUX/USD (exchange NASDAQ) in pandas</span>
+<span class="sd">        dataframe. Fake data is created for the weekend with the previous close value of Friday.</span>
+
+<span class="sd">        :return: Gold and crude oil close data from 03/06/2012 to 15/07/2021.</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;crude oil&quot;</span><span class="p">,</span> <span class="s2">&quot;xau&quot;</span><span class="p">]</span>
+        <span class="n">dataframes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+            <span class="n">search_result</span> <span class="o">=</span> <span class="n">investpy</span><span class="o">.</span><span class="n">search_quotes</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">symbol</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">retrieve_historical_data</span><span class="p">(</span><span class="n">from_date</span><span class="o">=</span><span class="s1">&#39;03/06/2012&#39;</span><span class="p">,</span> <span class="n">to_date</span><span class="o">=</span><span class="s1">&#39;15/07/2021&#39;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;Open&quot;</span><span class="p">,</span> <span class="s2">&quot;High&quot;</span><span class="p">,</span> <span class="s2">&quot;Low&quot;</span><span class="p">,</span> <span class="s2">&quot;Volume&quot;</span><span class="p">,</span> <span class="s2">&quot;Change Pct&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="n">index_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2012-06-03&quot;</span><span class="p">,</span> <span class="s2">&quot;2021-07-15&quot;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index_date</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;bfill&#39;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Close&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Close-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
+            <span class="n">dataframes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.get_csv_path"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.get_csv_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_csv_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the absolute path to the dataset.csv file.</span>
+
+<span class="sd">        :return: the absolute path to dataset.csv.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_csv_path</span></div>
+
+<div class="viewcode-block" id="Dataset.get_csv_with_future_path"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.get_csv_with_future_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_csv_with_future_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the absolute path to the dataset_with_future.csv file.</span>
+
+<span class="sd">        :return: the absolute path to dataset_with_future.csv.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_csv_with_future_path</span></div>
+
+<div class="viewcode-block" id="Dataset.get_btc_data"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.get_btc_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_btc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns OHLCV data about Bitcoin, daily interval.</span>
+
+<span class="sd">        :return: Daily data about Bitcoin with Open, High, Low, Close and Volume values.</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__btc_data</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__get_absolut_path_to_data</span><span class="p">(</span><span class="n">rel_path</span><span class="p">:</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the absolute path to the current file.</span>
+
+<span class="sd">        :param rel_path: relative path to the current file</span>
+<span class="sd">        :type rel_path: string</span>
+<span class="sd">        :return: the absolute path to current file.</span>
+<span class="sd">        :rtype: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">abs_file_path</span>
+
+<div class="viewcode-block" id="Dataset.create_dataset"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.Dataset.create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a csv file with data from all the biggest exchanges</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">csv_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_csv_path</span><span class="p">())</span>
+        <span class="n">csv_future_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_csv_with_future_path</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">csv_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">csv_future_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">get_btc_data</span><span class="p">(),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">fetch_data_by_symbol</span><span class="p">(),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">fetch_blockchain_btc_data</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)</span>
+            <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_csv_path</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="s2">&quot;2017-12-17&quot;</span><span class="p">]</span>
+            <span class="n">dataframe_with_future</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_future_btc_data</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dataframe_with_future</span> <span class="o">=</span> <span class="n">dataframe_with_future</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)</span>
+            <span class="n">dataframe_with_future</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_csv_with_future_path</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../source.fetch.html#source.fetch.fetch.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Joseph Chartois.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
