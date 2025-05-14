@@ -1,0 +1,71 @@
+# Virtual Environment
+.venv/
+.env/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Documentation
+documentation/*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.vs/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Model checkpoints and data
+*.keras
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.pb
+
+# Data files
+*.csv
+*.json
+*.xlsx
+*.xls
+
+# Logs
+*.log
+logs/
+tensorboard/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Compiled files from requirements
+source/requirements/compiled-requirements*.txt
+
+# Local python version
+.python-version
