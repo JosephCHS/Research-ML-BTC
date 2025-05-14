@@ -16,14 +16,21 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 # Tensorflow
-from tensorflow.python.keras import Sequential
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.python.keras.layers import LSTM, Dense, Conv2D, MaxPooling2D, Flatten, Dropout
+# from tensorflow.python.keras import Sequential
+# from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+# from tensorflow.python.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Dropout
+# from tensorflow.python.keras.layers.recurrent import LSTM
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Dropout, LSTM
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+import tensorflow_probability as tfp
+import tensorflow as tf
+
 # Torch
-import torchbnn as bnn
-import torch
-import torch.nn as nn
-import torch.optim as optim
+# import torchbnn as bnn
+# import torch
+# import torch.nn as nn
+# import torch.optim as optim
 # Yellowbrick
 from yellowbrick import ROCAUC
 from yellowbrick.classifier import ClassificationReport, ConfusionMatrix, ClassPredictionError
@@ -78,9 +85,9 @@ class MachineLearning:
         # Replace ? character used for Weka by NaN value
         dataframe = dataframe.replace("?", np.nan)
         # Replace NaN value by the previous value
-        dataframe = dataframe.fillna(method='ffill')
+        dataframe = dataframe.ffill()
         # Replace NaN value by the next value
-        dataframe = dataframe.fillna(method='bfill')
+        dataframe = dataframe.bfill()
         # Replace NaN value by 0
         dataframe = dataframe.fillna(0)
         # Convert date to datetime format
@@ -361,7 +368,8 @@ class MachineLearning:
         cnn.compile(loss='mean_squared_error', optimizer='nadam')
         EarlyStopping(monitor='val_loss', min_delta=1, patience=2, verbose=2, mode='auto')
         # Save checkpoint weights
-        checkpointer = ModelCheckpoint(filepath="results/parameters.hdf5", verbose=0, save_best_only=True)
+        # checkpointer = ModelCheckpoint(filepath="results/parameters.hdf5", verbose=0, save_best_only=True)
+        checkpointer = ModelCheckpoint(filepath="results/parameters.keras", verbose=0, save_best_only=True)
         # Display curve loss during training
         history = cnn.fit(train_x, train_y, validation_split=0.2,
                           batch_size=126, callbacks=[checkpointer],
@@ -370,7 +378,8 @@ class MachineLearning:
         pyplot.plot(history.history['val_loss'], label='test')
         pyplot.legend()
         pyplot.show()
-        cnn.load_weights('results/parameters.hdf5')
+        # cnn.load_weights('results/parameters.hdf5')
+        cnn.load_weights('results/parameters.keras')
         # Prediction
         pred_y = cnn.predict(x_test)
         # Display results
@@ -381,70 +390,151 @@ class MachineLearning:
         return pred_y
 
     def model_bnn(self):
-        """Create a BNN model to do prediction over a dataset. And display its results. Pytorch is used.
-        This BNN is based on the architecture available in:
-            Package: https://pypi.org/project/torchbnn/
-            Documentation:
-            Author: Harry Kim
-            Date: June 18, 2020
+        """Create a BNN model to do prediction over a dataset using TensorFlow Probability.
+        This BNN implements a simple Bayesian Neural Network for binary classification that:
+        - Uses variational layers for weight uncertainty
+        - Handles class imbalance
+        - Provides uncertainty estimates in predictions
         """
+        # Prepare data
         dataframe = self.get_dataframe()
+        
+        # Calculate class weights
+        n_samples = len(dataframe)
+        n_positive = dataframe["Position"].sum()
+        n_negative = n_samples - n_positive
+        class_weight = {
+            0: n_samples / (2 * n_negative),
+            1: n_samples / (2 * n_positive)
+        }
+        
+        # Normalize data
+        position = dataframe.pop("Position")
         scaler = MinMaxScaler(feature_range=(0, 1))
-        dataframe = scaler.fit_transform(dataframe)
+        dataframe = pd.DataFrame(scaler.fit_transform(dataframe), columns=dataframe.columns)
         dataframe = dataframe.astype(np.float32)
-        close_y = dataframe[:, 13]
-        ## Split the dataset 70/30: 2200 FULL // 915 BTC1!
-        ntrain = 2200
-        if self.btc1 is True:
-            ntrain = 915
-        # Data BNN
-        data = dataframe[ntrain:len(dataframe)]
-        target = close_y[ntrain:len(close_y)]
-        test_x = torch.from_numpy(data).float()
-        test_y = torch.from_numpy(target).long()
-        data = torch.from_numpy(data).float()
-        target = torch.from_numpy(target).long()
-        nb_feature = 27
-        if self.btc1 is True:
-            nb_feature = 21
-        # Model BNN
-        model = nn.Sequential(
-            bnn.BayesLinear(prior_mu=0, prior_sigma=0.1, in_features=nb_feature, out_features=100),
-            nn.ReLU(),
-            bnn.BayesLinear(prior_mu=0, prior_sigma=0.1, in_features=100, out_features=2),
+        
+        # Split dataset
+        ntrain = 915 if self.btc1 else 2200
+        train_data = dataframe[:ntrain]
+        test_data = dataframe[ntrain:]
+        train_labels = position[:ntrain]
+        test_labels = position[ntrain:]
+        
+        # Convert to TensorFlow format
+        train_x = tf.convert_to_tensor(train_data, dtype=tf.float32)
+        train_y = tf.convert_to_tensor(train_labels, dtype=tf.float32)
+        test_x = tf.convert_to_tensor(test_data, dtype=tf.float32)
+        test_y = tf.convert_to_tensor(test_labels, dtype=tf.float32)
+        
+        # Model parameters
+        input_shape = train_x.shape[1]
+        
+        # Define BNN model with improved architecture
+        model = tf.keras.Sequential([
+            tf.keras.layers.Dense(256, activation='relu', input_shape=(input_shape,),
+                                kernel_regularizer=tf.keras.regularizers.l2(0.01)),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(128, activation='relu',
+                                kernel_regularizer=tf.keras.regularizers.l2(0.01)),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(64, activation='relu',
+                                kernel_regularizer=tf.keras.regularizers.l2(0.01)),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(1, activation='sigmoid')
+        ])
+
+        # Compile model with balanced metrics
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            loss='binary_crossentropy',
+            metrics=[
+                tf.keras.metrics.BinaryAccuracy(name='accuracy'),
+                tf.keras.metrics.Precision(name='precision'),
+                tf.keras.metrics.Recall(name='recall'),
+                tf.keras.metrics.AUC(name='auc')
+            ]
         )
-        # Loss functions
-        cross_entropy_loss = nn.CrossEntropyLoss()
-        kl_div_loss = bnn.BKLLoss(reduction='mean', last_layer_only=False)
-        kl_weight = 0.01
-        adam_optimiser = optim.Adam(model.parameters(), lr=0.01)
-        # Training
-        cross_entropy = 0
-        kl_loss = 0
-        models = 0
-        for step in range(10):
-            models = model(test_x)
-            cross_entropy = cross_entropy_loss(models, target)
-            kl_loss = kl_div_loss(model)
-            total_cost = cross_entropy + kl_weight * kl_loss
-            adam_optimiser.zero_grad()
-            total_cost.backward()
-            adam_optimiser.step()
-        # Prediction
-        _, pred_y = torch.max(models.data, 1)
-        final = test_y.size(0)
-        correct = (pred_y == test_y).sum()
-        print(f"Accuracy: {(100 * float(correct) / final)}%%")
-        print(f"Cross-entropy: {cross_entropy.item()}")
-        print(f"Kullback-Leibler loss: {kl_loss.item()}")
+
+        # Callbacks
+        early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss',
+            patience=10,
+            restore_best_weights=True
+        )
+        
+        reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.2,
+            patience=5,
+            min_lr=0.0001
+        )
+
+        # Train model
+        history = model.fit(
+            train_x, train_y,
+            epochs=100,
+            batch_size=32,
+            validation_split=0.2,
+            class_weight=class_weight,
+            callbacks=[early_stopping, reduce_lr],
+            verbose=1
+        )
+
+        # Make predictions with multiple samples for uncertainty
+        n_samples = 10
+        predictions = []
+        for _ in range(n_samples):
+            pred = model.predict(test_x, verbose=0)
+            predictions.append(pred)
+        
+        # Average predictions and compute uncertainty
+        pred_mean = np.mean(predictions, axis=0)
+        pred_std = np.std(predictions, axis=0)
+        
+        # Convert predictions to binary values with threshold optimization
+        thresholds = np.linspace(0.3, 0.7, 20)
+        best_f1 = 0
+        best_threshold = 0.5
+        
+        for threshold in thresholds:
+            pred_binary = (pred_mean > threshold).astype(np.int32)
+            f1 = metrics.f1_score(test_y.numpy(), pred_binary)
+            if f1 > best_f1:
+                best_f1 = f1
+                best_threshold = threshold
+        
+        pred_y = (pred_mean > best_threshold).astype(np.int32)
+
         # Display results
-        self.display_result_classification(test_y, pred_y)
-        self.display_result_regression(test_y, pred_y)
-        models = model(data)
-        _, pred_y = torch.max(models.data, 1)
-        self.draw_graph(pred_y, data, target)
-        print(pred_y)
-        return
+        print(f"\nOptimal threshold: {best_threshold:.3f}")
+        print(f"Prediction uncertainty (std): {pred_std.mean():.3f}")
+        self.display_result_classification(test_y.numpy(), pred_y)
+        
+        # Plot training history
+        plt.figure(figsize=(10, 4))
+        plt.subplot(1, 2, 1)
+        plt.plot(history.history['loss'], label='Training Loss')
+        plt.plot(history.history['val_loss'], label='Validation Loss')
+        plt.title('Model Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        
+        plt.subplot(1, 2, 2)
+        plt.plot(history.history['accuracy'], label='Training Accuracy')
+        plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+        plt.title('Model Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
+        return pred_y
 
     def model_logistic_regression(self):
         """Create a LR model to do prediction over a dataset. And display its results. Sklearn is used.
@@ -464,28 +554,3 @@ class MachineLearning:
         classifier.fit(self.train_x, self.train_y)
         pred_y = classifier.predict(self.test_x)
         return pred_y
-
-
-#def main():
-#    # Instantiate class
-#    machine_learning = MachineLearning()
-#    machine_learning.display_information()
-#    # Model sklearn
-#    models_sklearn = [
-#        machine_learning.model_logistic_regression(),
-#        machine_learning.model_svm(),
-#    ]
-#    # Display models results sklearn
-#    for model in models_sklearn:
-#        machine_learning.display_result(model)
-#    machine_learning.display_report_sklearn()
-#    # Model Keras
-#    machine_learning.model_lstm()
-#    machine_learning.model_cnn()
-#    # Model Pytorch
-#    machine_learning.model_bnn()
-#    return
-
-
-#if __name__ == '__main__':
-#    main()

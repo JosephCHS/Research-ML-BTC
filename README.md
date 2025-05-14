@@ -1,89 +1,86 @@
-# F21MP_2020 - Research-ML-BTC - H00359322
+# Research-ML-BTC
 
+A machine learning research project for Bitcoin price prediction using various ML/DL approaches including LSTM, CNN, and Bayesian Neural Networks.
 
-# Introduction
+## Requirements
 
-As part of the course *F21MP_2020-2021, Masters Project and Dissertation* carried out at Heriot-Watt University for the MSc Data Science, the **Research-ML-BTC** project was carried out.
-This project is open-source and versioned on Git.
+- Python 3.12.3 or higher
+- CUDA capable GPU (optional, for GPU acceleration)
+- Git
 
+## Installation
 
-It is avaible on :
-- HWU Gitlab MACS (requires an HWU ID): [Gitlab](https://gitlab-student.macs.hw.ac.uk/jmmc2000/f21mp_2020-2021)
-- The Github of the author Joseph Chartois: [Github](https://github.com/JosephCHS/Research-ML-BTC)
-
-
-# Documentation
-
-The documentation is generated with the Sphinx framework with the Read The Doc template.
-It is accessible via the file: `/documentation/build/html/index.html`
-
-# Pre-requisites (linux)
-
-1. Git clones the repository: 
-- `git clone git@gitlab-student.macs.hw.ac.uk:jmmc2000/f21mp_2020-2021.git`
-or
-- `git clone git@github.com:JosephCHS/Research-ML-BTC.git`
-2. Enter the directory 
-3. Have Python 3 installed (default on recent OS like Ubuntu or Debian)
-4. Install pip: `sudo apt install -y python3-pip`
-5. Install virtual-env: `python3 -m pip install --user virtualenv`
-6. Activate the virtual environment: `source .venv/bin/activate`
-7. Install the prerequisites in the virtual environment: `pip install -r source/requirements.txt`
-
-
-# Usage 
-
-You can import modules from the project and use the classes and their methods.
-In addition, documentation is available: `/documentation/build/html/index.html`
-Examples of usage are written at the bottom of the files and commented to guide the user. 
-These examples are also available bellow.
-
-
-## Fetch
-```
-dataset = Dataset()  
-dataset.create_dataset()
+1. Clone the repository:
+```bash
+git clone https://github.com/JosephCHS/Research-ML-BTC.git 
+cd Research-ML-BTC
 ```
 
-## Convert
+2. Setup the environment:
+```bash
+make init
 ```
-convert = Arff()  
-convert.generate_arff()  
-convert.generate_arff_with_future()
+This will:
+- Ensure correct Python version is installed (3.12.3)
+- Create a virtual environment
+- Install all required dependencies
+
+## Usage
+
+To run the complete analysis:
+```bash
+make run
 ```
 
-## Chart
-
-### Candlesticks
-```
-dataset = Dataset()  
-dataframe_btc = dataset.get_btc_data()  
-candlesticks = Candlesticks()  
-candlesticks.display_candlesticks_chart(dataframe_btc)
+To clean up generated files and virtual environment:
+```bash
+make clean
 ```
 
-### Confusion_matrix
-```
-ConfusionMatrix(True)
-```
+## Project Structure
 
-## Model
-```
-# Instantiate class  
-machine_learning = MachineLearning()  
-machine_learning.display_information()  
-# Model sklearn  
-models_sklearn = [  
-    machine_learning.model_logistic_regression(),  
-  machine_learning.model_svm(),  
-]  
-# Display models results sklearn  
-for model in models_sklearn:  
-    machine_learning.display_result(model)  
-machine_learning.display_report_sklearn()  
-# Model Keras  
-machine_learning.model_lstm()  
-machine_learning.model_cnn()  
-# Model Pytorch  
-machine_learning.model_bnn()
+- `source/` - Main source code
+  - `model/` - Machine learning models implementation
+  - `fetch/` - Data collection and preprocessing
+  - `requirements.txt` - Python dependencies
+
+## Models Implemented
+
+1. Traditional ML:
+   - Logistic Regression
+   - Support Vector Machine (SVM)
+
+2. Deep Learning:
+   - Long Short-Term Memory (LSTM)
+   - Convolutional Neural Network (CNN)
+   - Bayesian Neural Network (BNN)
+
+## Documentation
+
+Generated documentation is available at `/documentation/build/html/index.html`
+
+## Technical Details
+
+- TensorFlow 2.x with CUDA support
+- Python 3.12.3
+- Scikit-learn for traditional ML models
+- Yellowbrick for ML visualization
+- TensorFlow Probability for Bayesian Neural Networks
+
+## Example Usage
+
+```python
+from model.machine_learning import MachineLearning
+
+# Initialize models
+ml = MachineLearning()
+
+# Train and evaluate traditional ML models
+pred_lr = ml.model_logistic_regression()
+pred_svm = ml.model_svm()
+
+# Train and evaluate deep learning models
+pred_lstm = ml.model_lstm()
+pred_cnn = ml.model_cnn()
+pred_bnn = ml.model_bnn()
 ```
