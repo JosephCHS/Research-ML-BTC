@@ -30,7 +30,7 @@ update-deps:
 	pip-sync $(REQUIREMENTS_DIR)/compiled-requirements.txt $(REQUIREMENTS_DIR)/compiled-requirements-dev.txt
 
 run:
-	. $(VENV)/bin/activate && python source/main.py
+	. $(VENV)/bin/activate && python -m source.main
 
 clean:
 	rm -rf $(VENV)
